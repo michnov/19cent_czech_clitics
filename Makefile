@@ -73,6 +73,11 @@ $(OUTPUT_DIR)/$(DATA_NAME).features.tsv: $(TMP_DIR)/02.parsed/$(DATA_NAME).conll
 		.clitics.CliticFeats \
 		< $< > $@
 
+gold-clauses: $(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt
+$(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt: $(INPUT_DIR)/$(DATA_NAME).tsv
+	mkdir -p $(OUTPUT_DIR)
+	tail -n+2 $< | cut -f3 > $@
+
 clean:
 	rm -rf $(TMP_DIR)/*
 
