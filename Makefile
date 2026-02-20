@@ -73,6 +73,22 @@ $(OUTPUT_DIR)/$(DATA_NAME).features.tsv: $(TMP_DIR)/02.parsed/$(DATA_NAME).conll
 		.clitics.CliticFeats \
 		< $< > $@
 
+# Skip rows (1-based data rows, not counting header):
+#   gold: 50, 112, 113, 123, 126  (ADP/problematic gold annotations)
+#   pred: 112, 113                 (UDPipe false-positive detections)
+SKIP_GOLD=50,112,113,123,126
+SKIP_PRED=112,113
+
+eval: $(OUTPUT_DIR)/$(DATA_NAME).eval.txt
+$(OUTPUT_DIR)/$(DATA_NAME).eval.txt: $(INPUT_DIR)/$(DATA_NAME).tsv $(OUTPUT_DIR)/$(DATA_NAME).features.tsv
+	mkdir -p $(OUTPUT_DIR)
+	python3 clitics/eval_clause.py \
+		--skip-gold $(SKIP_GOLD) \
+		--skip-pred $(SKIP_PRED) \
+		$(INPUT_DIR)/$(DATA_NAME).tsv \
+		$(OUTPUT_DIR)/$(DATA_NAME).features.tsv \
+		| tee $@
+
 clean:
 	rm -rf $(TMP_DIR)/*
 
