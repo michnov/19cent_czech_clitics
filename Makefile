@@ -65,6 +65,11 @@ $(TMP_DIR)/02.parsed/%.conllu: $(TMP_DIR)/01.sentences/%.uniq.txt
 		write.Conllu \
 		< $< > $@
 
+gold-clauses: $(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt
+$(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt: $(INPUT_DIR)/$(DATA_NAME).tsv
+	mkdir -p $(OUTPUT_DIR)
+	tail -n+2 $< | cut -f3 > $@
+
 clean:
 	rm -rf $(TMP_DIR)/*
 
