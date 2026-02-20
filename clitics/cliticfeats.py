@@ -3,7 +3,10 @@ from udapi.core.block import Block
 
 
 # Dependency relations that introduce a subordinate (dependent) clause.
-_SUBORDINATING_DEPRELS = {"ccomp", "xcomp", "advcl", "acl"}
+# xcomp is intentionally excluded: in Czech it marks the infinitive complement
+# of modal/phase verbs (musí, začal, nechal, …) which together form a complex
+# predicate, NOT a separate dependent clause.
+_SUBORDINATING_DEPRELS = {"ccomp", "advcl", "acl", "csubj"}
 
 
 class CliticFeats(Block):
@@ -17,7 +20,11 @@ class CliticFeats(Block):
     * ``ord``           – 1-based position of the *se* token in the sentence
     * ``predicate_form`` – space-joined forms of the governing predicate and
                            all its auxiliary/copular dependents, in sentence
-                           order (represents the full complex predicate)
+                           order (represents the full complex predicate).
+                           When the governing verb is itself an ``xcomp``
+                           complement (e.g. modal/phase verb construction),
+                           the chain of ``xcomp`` heads and their own
+                           auxiliaries is also included.
     * ``clause_type``   – ``HV`` if the predicate is part of the main clause,
                            ``VV`` if it is part of a dependent/subordinate
                            clause
@@ -46,9 +53,12 @@ class CliticFeats(Block):
     def _predicate_form(predicate):
         """Return space-joined forms of the complex predicate in sentence order.
 
-        The complex predicate consists of the governing verb (``predicate``)
-        together with any auxiliary or copular children attached to it via
-        ``aux``, ``aux:pass``, or ``cop`` dependency relations.
+        The complex predicate consists of:
+        * the governing verb (``predicate``) and all its ``aux``/``cop``
+          dependents, and
+        * the chain of ``xcomp`` heads above it (modal/phase verbs like
+          *musí*, *začal*, *nechal*) together with *their* ``aux``/``cop``
+          dependents.
         """
         if predicate is None or predicate.is_root():
             return "_"
@@ -57,6 +67,26 @@ class CliticFeats(Block):
             base_deprel = child.deprel.split(":")[0] if child.deprel else ""
             if base_deprel in ("aux", "cop"):
                 parts.append(child)
+
+        # Climb through xcomp chain: each xcomp head is part of the complex
+        # predicate (e.g. "musí se opírat" → forms: musí opírat).
+        visited = {predicate}
+        node = predicate
+        while True:
+            base_deprel = node.deprel.split(":")[0] if node.deprel else ""
+            if base_deprel != "xcomp" or node.parent is None or node.parent.is_root():
+                break
+            head = node.parent
+            if head in visited:
+                break
+            visited.add(head)
+            parts.append(head)
+            for child in head.children:
+                base_ch = child.deprel.split(":")[0] if child.deprel else ""
+                if base_ch in ("aux", "cop"):
+                    parts.append(child)
+            node = head
+
         parts.sort(key=lambda n: n.ord)
         return " ".join(part.form for part in parts)
 
@@ -68,15 +98,20 @@ class CliticFeats(Block):
         The first node whose base dependency relation is either ``root``
         (→ main clause, ``HV``) or a member of ``_SUBORDINATING_DEPRELS``
         (→ dependent clause, ``VV``) determines the result.
+
+        ``xcomp`` relations are transparent: the method passes through them
+        because in Czech they connect the infinitive complement to its
+        modal/phase verb head within the same predicate cluster, not across
+        clause boundaries.
         """
         if predicate is None or predicate.is_root():
             return "_"
         visited = set()
         node = predicate
         while True:
-            if id(node) in visited:
+            if node in visited:
                 return "HV"  # cycle guard – treat as main clause
-            visited.add(id(node))
+            visited.add(node)
             base_deprel = node.deprel.split(":")[0] if node.deprel else ""
             if base_deprel == "root":
                 return "HV"
