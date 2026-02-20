@@ -1,5 +1,0 @@
-header
-A
-comment
-B
-C
