@@ -1,6 +1,7 @@
 """Block CliticFeats extracts features for Czech clitic 'se'."""
 from udapi.core.block import Block
 
+
 # Dependency relations that introduce a subordinate (dependent) clause.
 _SUBORDINATING_DEPRELS = {"ccomp", "xcomp", "advcl", "acl"}
 
@@ -35,6 +36,7 @@ class CliticFeats(Block):
         clause_type = self._clause_type(predicate)
         sent_id = node.root.sent_id or ""
         print(f"{sent_id}\t{node.ord}\t{predicate_form}\t{clause_type}")
+        print(node.root.get_sentence())
 
     # ------------------------------------------------------------------
     # helpers
