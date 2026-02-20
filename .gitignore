@@ -3,3 +3,4 @@
 /lib
 /.venv
 /__pycache__
+clitics/__pycache__/
