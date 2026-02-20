@@ -16,16 +16,18 @@ def parse_args():
     parser.add_argument(
         "--skip-gold",
         type=int,
-        default=0,
+        nargs="+",
+        default=[],
         metavar="N",
-        help="Number of lines to skip at the beginning of the gold file (default: 0).",
+        help="Line numbers (0-based) to skip in the gold file.",
     )
     parser.add_argument(
         "--skip-predicted",
         type=int,
-        default=0,
+        nargs="+",
+        default=[],
         metavar="N",
-        help="Number of lines to skip at the beginning of the predicted file (default: 0).",
+        help="Line numbers (0-based) to skip in the predicted file.",
     )
     return parser.parse_args()
 
@@ -33,7 +35,8 @@ def parse_args():
 def read_labels(path, skip):
     with open(path, encoding="utf-8") as f:
         lines = f.readlines()
-    return [line.rstrip("\n") for line in lines[skip:]]
+    skip_set = set(skip)
+    return [line.rstrip("\n") for i, line in enumerate(lines) if i not in skip_set]
 
 
 def main():
