@@ -1,45 +1,36 @@
-UDPipe
-Udapi
-
-1:
-2: doklad
-    - input
-outputs:
-3: veta
-    - values: (HV) hlavni / (VV) vedlejsi
-    - je v Udapi?
-4: pozice v klauzi
-    - klauze: podstrom finitniho slovesa
-    - pozice cele kliticke skupiny (se + mu/ho + bych + jsem)
-    - zajmena v dlouhe forme nejsou klitika
-    - values: inicialni / postinicialni / delayed (medialni / prefinalni / finalni)
-    - inicialni:
-        - zacatek klauze (ani sloveso pred klitikou)
-        - igorovat interpunkci
-    - postinicialni:
-        - druha pozice -> po prvnim konstituentu
-    - delayed
-        - treti pozice a dal
-        - finalni:
-            - na posledni pozici v klauzi + predposledni je rodicovske sloveso
-        - prefinalni:
-            - na predposledni pozici v klauzi + posledni je rodicovske sloveso
-        - medialni:
-            - vse ostatni
-12: vztah s regentem
-    - regent = rodicovske sloveso
-    - znovu pozice cele kliticke skupiny (se + mu/ho + bych + jsem)
-    - values: kontaktni preverbalni / kontaktni postverbalni / kontaktni interverbalni / izolovana
-    - preverbalni:
-        - hned pred regentem
-    - postverbalni:
-        - hned za regentem
-    - interverbalni:
-        - uvnitr slozene slovesni formy regenta
-    - izolovana:
-        - oddelena od regenta jinym konstituentem
-        - jenom vlevo od regenta
-    - jine
-        - vse ostatni
-        
-
+veta
+ - values: (HV) hlavni / (VV) vedlejsi
+ - je v Udapi?
+pozice v klauzi
+ - klauze: podstrom finitniho slovesa
+ - pozice cele kliticke skupiny (se + mu/ho + bych + jsem)
+ - zajmena v dlouhe forme nejsou klitika
+ - values: inicialni / postinicialni / delayed (medialni / prefinalni / finalni)
+ - inicialni:
+     - zacatek klauze (ani sloveso pred klitikou)
+     - igorovat interpunkci
+ - postinicialni:
+     - druha pozice -> po prvnim konstituentu
+ - delayed
+     - treti pozice a dal
+     - finalni:
+         - na posledni pozici v klauzi + predposledni je rodicovske sloveso
+     - prefinalni:
+         - na predposledni pozici v klauzi + posledni je rodicovske sloveso
+     - medialni:
+         - vse ostatni
+vztah s regentem
+ - regent = rodicovske sloveso
+ - znovu pozice cele kliticke skupiny (se + mu/ho + bych + jsem)
+ - values: kontaktni preverbalni / kontaktni postverbalni / kontaktni interverbalni / izolovana / jine
+ - preverbalni:
+     - hned pred regentem
+ - postverbalni:
+     - hned za regentem
+ - interverbalni:
+     - uvnitr slozene slovesni formy regenta
+ - izolovana:
+     - oddelena od regenta jinym konstituentem
+     - jenom vlevo od regenta
+ - jine
+     - vse ostatni
