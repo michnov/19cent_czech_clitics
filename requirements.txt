@@ -1,0 +1,5 @@
+# Core dependencies
+# Add other dependencies as needed
+
+# Local udapi installation (will be installed via submodule)
+-e ./lib/udapi-python

@@ -1,1 +1,5 @@
 /input_data
+/tmp
+/lib
+/.venv
+/__pycache__
