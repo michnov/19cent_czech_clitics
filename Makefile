@@ -65,6 +65,14 @@ $(TMP_DIR)/02.parsed/%.conllu: $(TMP_DIR)/01.sentences/%.uniq.txt
 		write.Conllu \
 		< $< > $@
 
+features: $(OUTPUT_DIR)/$(DATA_NAME).features.tsv
+$(OUTPUT_DIR)/$(DATA_NAME).features.tsv: $(TMP_DIR)/02.parsed/$(DATA_NAME).conllu
+	mkdir -p $(OUTPUT_DIR)
+	PYTHONPATH=$(PWD) udapy \
+		read.Conllu \
+		.clitics.CliticFeats \
+		< $< > $@
+
 clean:
 	rm -rf $(TMP_DIR)/*
 
