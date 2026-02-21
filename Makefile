@@ -65,10 +65,37 @@ $(TMP_DIR)/02.parsed/%.conllu: $(TMP_DIR)/01.sentences/%.uniq.txt
 		write.Conllu \
 		< $< > $@
 
+features: $(OUTPUT_DIR)/$(DATA_NAME).features.tsv
+$(OUTPUT_DIR)/$(DATA_NAME).features.tsv: $(TMP_DIR)/02.parsed/$(DATA_NAME).conllu
+	mkdir -p $(OUTPUT_DIR)
+	PYTHONPATH=$(PWD) udapy \
+		read.Conllu \
+		.clitics.CliticFeats \
+		< $< > $@
+
 gold-clauses: $(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt
 $(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt: $(INPUT_DIR)/$(DATA_NAME).tsv
 	mkdir -p $(OUTPUT_DIR)
 	tail -n+2 $< | cut -f3 > $@
+
+pred-clauses: $(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt
+$(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt: $(OUTPUT_DIR)/$(DATA_NAME).features.tsv
+	mkdir -p $(OUTPUT_DIR)
+	tail -n+2 $< | cut -f4 > $@
+
+# Skip line numbers are 0-based (matching evaluate.py convention).
+# Derived from 1-based data row numbers (not counting the TSV header):
+#   gold rows to skip: 50, 112, 113, 123, 126  → 0-based: 49 111 112 122 125
+#   pred rows to skip: 112, 113                → 0-based: 111 112
+eval: $(OUTPUT_DIR)/$(DATA_NAME).eval.txt
+$(OUTPUT_DIR)/$(DATA_NAME).eval.txt: $(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt $(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt
+	mkdir -p $(OUTPUT_DIR)
+	python3 evaluate.py \
+		$(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt \
+		$(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt \
+		--skip-gold 49 111 112 122 125 \
+		--skip-predicted 111 112 \
+		| tee $@
 
 clean:
 	rm -rf $(TMP_DIR)/*
