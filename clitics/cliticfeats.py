@@ -7,9 +7,6 @@ from udapi.core.block import Block
 # of modal/phase verbs (musí, začal, nechal, …) which together form a complex
 # predicate, NOT a separate dependent clause.
 _SUBORDINATING_DEPRELS = {"ccomp", "advcl", "acl", "csubj"}
-_CLITIC_GROUP_FORMS = {"se", "mu", "ho", "bych", "jsem"}
-
-
 class CliticFeats(Block):
     """Extract features for the Czech clitic *se* (not a preposition).
 
@@ -39,7 +36,7 @@ class CliticFeats(Block):
         )
 
     def process_node(self, node):
-        if node.form.lower() != "se" or node.upos == "ADP":
+        if not self._is_target_se_clitic(node):
             return
         predicate = node.parent
         predicate_form = self._predicate_form(predicate)
@@ -195,12 +192,66 @@ class CliticFeats(Block):
     def _is_group_clitic(node):
         if node is None:
             return False
-        form = (node.form or "").lower()
-        if form not in _CLITIC_GROUP_FORMS:
+        feats = CliticFeats._parse_feats(getattr(node, "feats", ""))
+        lemma = (getattr(node, "lemma", "") or "").lower()
+        upos = getattr(node, "upos", "")
+        deprel = (getattr(node, "deprel", "") or "").split(":")[0]
+
+        if CliticFeats._is_target_se_clitic(node):
+            return True
+        if (
+            upos == "PRON"
+            and lemma in {"on", "já", "ty"}
+            and feats.get("Variant") == "Short"
+            and feats.get("Case") in {"Acc", "Dat"}
+        ):
+            return True
+        if (
+            upos == "AUX"
+            and lemma == "být"
+            and deprel == "aux"
+            and feats.get("VerbForm") == "Fin"
+            and (
+                feats.get("Mood") == "Cnd"
+                or (
+                    feats.get("Mood") == "Ind"
+                    and feats.get("Tense") == "Pres"
+                    and feats.get("Person") in {"1", "2"}
+                )
+            )
+        ):
+            return True
+        return False
+
+    @staticmethod
+    def _is_target_se_clitic(node):
+        if node is None:
             return False
-        if form == "se" and getattr(node, "upos", "") == "ADP":
-            return False
-        return True
+        feats = CliticFeats._parse_feats(getattr(node, "feats", ""))
+        return (
+            getattr(node, "upos", "") == "PRON"
+            and (getattr(node, "lemma", "") or "").lower() == "se"
+            and feats.get("Reflex") == "Yes"
+            and feats.get("PronType") == "Prs"
+            and feats.get("Variant") == "Short"
+        )
+
+    @staticmethod
+    def _parse_feats(feats):
+        if feats is None:
+            return {}
+        if hasattr(feats, "items"):
+            return {k: v for k, v in feats.items() if v}
+        feats_str = str(feats)
+        if not feats_str or feats_str == "_":
+            return {}
+        parsed = {}
+        for part in feats_str.split("|"):
+            if "=" not in part:
+                continue
+            key, value = part.split("=", 1)
+            parsed[key] = value
+        return parsed
 
     @staticmethod
     def _predicate_nodes(predicate):
