@@ -7,6 +7,7 @@ from udapi.core.block import Block
 # of modal/phase verbs (musí, začal, nechal, …) which together form a complex
 # predicate, NOT a separate dependent clause.
 _SUBORDINATING_DEPRELS = {"ccomp", "advcl", "acl", "csubj"}
+_CLITIC_GROUP_FORMS = {"se", "mu", "ho", "bych", "jsem"}
 
 
 class CliticFeats(Block):
@@ -195,7 +196,7 @@ class CliticFeats(Block):
         if node is None:
             return False
         form = (node.form or "").lower()
-        if form not in {"se", "mu", "ho", "bych", "jsem"}:
+        if form not in _CLITIC_GROUP_FORMS:
             return False
         if form == "se" and getattr(node, "upos", "") == "ADP":
             return False
