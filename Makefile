@@ -94,7 +94,7 @@ $(OUTPUT_DIR)/$(DATA_NAME).eval.txt: $(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt
 		$(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt \
 		$(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt \
 		--skip-gold 49 111 112 122 125 \
-		--skip-predicted 111 112 \
+		--skip-predicted 110 111 112 113 \
 		| tee $@
 
 clean:
