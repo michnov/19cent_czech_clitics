@@ -73,28 +73,53 @@ $(OUTPUT_DIR)/$(DATA_NAME).features.tsv: $(TMP_DIR)/02.parsed/$(DATA_NAME).conll
 		.clitics.CliticFeats \
 		< $< > $@
 
-gold-clauses: $(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt
-$(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt: $(INPUT_DIR)/$(DATA_NAME).tsv
-	mkdir -p $(OUTPUT_DIR)
-	tail -n+2 $< | cut -f3 > $@
+gold-clause_type: $(OUTPUT_DIR)/$(DATA_NAME).gold-clause_type.txt
+gold-position_in_clause: $(OUTPUT_DIR)/$(DATA_NAME).gold-position_in_clause.txt
+gold-regent_relation: $(OUTPUT_DIR)/$(DATA_NAME).gold-regent_relation.txt
 
-pred-clauses: $(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt
-$(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt: $(OUTPUT_DIR)/$(DATA_NAME).features.tsv
+$(OUTPUT_DIR)/$(DATA_NAME).gold-clause_type.txt: GOLD_COL=3
+$(OUTPUT_DIR)/$(DATA_NAME).gold-clause_position.txt: GOLD_COL=5
+$(OUTPUT_DIR)/$(DATA_NAME).gold-relation_to_regent.txt: GOLD_COL=13
+$(OUTPUT_DIR)/$(DATA_NAME).gold-%.txt: $(INPUT_DIR)/$(DATA_NAME).tsv
 	mkdir -p $(OUTPUT_DIR)
-	tail -n+2 $< | cut -f4 > $@
+	tail -n+2 $< | cut -f$(GOLD_COL) > $@
+
+pred-clause_type: $(OUTPUT_DIR)/$(DATA_NAME).pred-clause_type.txt
+pred-clause_position: $(OUTPUT_DIR)/$(DATA_NAME).pred-clause_position.txt
+pred-relation_to_regent: $(OUTPUT_DIR)/$(DATA_NAME).pred-relation_to_regent.txt
+
+$(OUTPUT_DIR)/$(DATA_NAME).pred-clause_type.txt: PRED_COL=4
+$(OUTPUT_DIR)/$(DATA_NAME).pred-clause_position.txt: PRED_COL=5
+$(OUTPUT_DIR)/$(DATA_NAME).pred-relation_to_regent.txt: PRED_COL=6
+$(OUTPUT_DIR)/$(DATA_NAME).pred-%.txt: $(OUTPUT_DIR)/$(DATA_NAME).features.tsv
+	mkdir -p $(OUTPUT_DIR)
+	tail -n+2 $< | cut -f$(PRED_COL) > $@
+
+
+eval-all : $(OUTPUT_DIR)/$(DATA_NAME).eval-clause_type.txt \
+		   $(OUTPUT_DIR)/$(DATA_NAME).eval-clause_position.txt \
+		   $(OUTPUT_DIR)/$(DATA_NAME).eval-relation_to_regent.txt
+	for eval_file in $^; do \
+		echo "============== Evaluation results for $$eval_file ================ "; \
+		cat $$eval_file; \
+		echo ""; \
+	done
 
 # Skip line numbers are 0-based (matching evaluate.py convention).
 # Derived from 1-based data row numbers (not counting the TSV header):
 #   gold rows to skip: 50, 112, 113, 123, 126  → 0-based: 49 111 112 122 125
 #   pred rows to skip: 112, 113                → 0-based: 111 112
-eval: $(OUTPUT_DIR)/$(DATA_NAME).eval.txt
-$(OUTPUT_DIR)/$(DATA_NAME).eval.txt: $(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt $(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt
+eval-clause_type: $(OUTPUT_DIR)/$(DATA_NAME).eval-clause_type.txt
+eval-clause_position: $(OUTPUT_DIR)/$(DATA_NAME).eval-clause_position.txt
+eval-relation_to_regent: $(OUTPUT_DIR)/$(DATA_NAME).eval-relation_to_regent.txt
+
+$(OUTPUT_DIR)/$(DATA_NAME).eval-%.txt: $(OUTPUT_DIR)/$(DATA_NAME).gold-%.txt $(OUTPUT_DIR)/$(DATA_NAME).pred-%.txt
 	mkdir -p $(OUTPUT_DIR)
 	python3 evaluate.py \
-		$(OUTPUT_DIR)/$(DATA_NAME).gold-clauses.txt \
-		$(OUTPUT_DIR)/$(DATA_NAME).pred-clauses.txt \
+		$(word 1,$^) \
+		$(word 2,$^) \
 		--skip-gold 49 111 112 122 125 \
-		--skip-predicted 111 112 \
+		--skip-predicted 110 111 112 113 \
 		| tee $@
 
 clean:
