@@ -49,7 +49,7 @@ class CliticFeats(Block):
             f"{sent_id}\t{node.ord}\t{predicate_form}\t{clause_type}\t"
             f"{clause_position}\t{relation_to_regent}"
         )
-        print(node.root.get_sentence())
+        #print(node.root.get_sentence())
 
     # ------------------------------------------------------------------
     # helpers
