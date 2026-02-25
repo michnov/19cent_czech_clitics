@@ -161,10 +161,10 @@ class CliticFeats(Block):
         if group_idx == 1:
             return "postiniciální"
         if group_idx == len(units) - 1 and group_idx > 0 and units[group_idx - 1] == predicate:
-            return "finální"
+            return "DelP: finální"
         if group_idx == len(units) - 2 and group_idx + 1 < len(units) and units[group_idx + 1] == predicate:
-            return "prefinální"
-        return "mediální"
+            return "DelP: prefinální"
+        return "DelP: mediální"
 
     @staticmethod
     def _relation_to_regent(predicate, clitic_group):
