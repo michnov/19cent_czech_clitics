@@ -1,0 +1,21 @@
+Evaluating 116 examples (26 skipped due to empty gold labels).
+
+Accuracy: 0.7155172413793104
+
+Classification report:
+                  precision    recall  f1-score   support
+
+   DelP: finální       1.00      0.67      0.80         3
+  DelP: mediální       0.53      0.97      0.68        32
+DelP: prefinální       0.80      0.62      0.70        32
+   postiniciální       1.00      0.61      0.76        49
+
+        accuracy                           0.72       116
+       macro avg       0.83      0.72      0.74       116
+    weighted avg       0.81      0.72      0.72       116
+
+Confusion matrix:
+[[ 2  1  0  0]
+ [ 0 31  1  0]
+ [ 0 12 20  0]
+ [ 0 15  4 30]]

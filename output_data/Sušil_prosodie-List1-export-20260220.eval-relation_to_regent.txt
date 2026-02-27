@@ -1,0 +1,21 @@
+Evaluating 116 examples (26 skipped due to empty gold labels).
+
+Accuracy: 0.9310344827586207
+
+Classification report:
+                        precision    recall  f1-score   support
+
+             izolovaná       1.00      0.96      0.98        26
+                  jiné       0.00      0.00      0.00         0
+kontaktní postverbální       0.97      0.87      0.92        45
+ kontaktní preverbální       0.88      0.98      0.93        45
+
+              accuracy                           0.93       116
+             macro avg       0.71      0.70      0.71       116
+          weighted avg       0.94      0.93      0.94       116
+
+Confusion matrix:
+[[25  1  0  0]
+ [ 0  0  0  0]
+ [ 0  0 39  6]
+ [ 0  0  1 44]]

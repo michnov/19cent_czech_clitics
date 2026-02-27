@@ -1,0 +1,17 @@
+Evaluating 116 examples (26 skipped due to empty gold labels).
+
+Accuracy: 0.8362068965517241
+
+Classification report:
+              precision    recall  f1-score   support
+
+          HV       0.80      0.92      0.85        61
+          VV       0.89      0.75      0.81        55
+
+    accuracy                           0.84       116
+   macro avg       0.85      0.83      0.83       116
+weighted avg       0.84      0.84      0.83       116
+
+Confusion matrix:
+[[56  5]
+ [14 41]]
