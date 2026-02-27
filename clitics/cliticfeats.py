@@ -32,7 +32,7 @@ class CliticFeats(Block):
 
     def process_start(self):
         print(
-            "sent_id\tord\tpredicate_form\tclause_type\tclause_position\trelation_to_regent"
+            "sent_id\tord\tsentence\tpredicate_form\tclause_type\tclause_position\trelation_to_regent"
         )
 
     def process_node(self, node):
@@ -45,15 +45,27 @@ class CliticFeats(Block):
         clause_position = self._clause_position(predicate, clitic_group)
         relation_to_regent = self._relation_to_regent(predicate, clitic_group)
         sent_id = node.root.sent_id or ""
+        sentence = self._sentence_with_marked_se(node)
         print(
-            f"{sent_id}\t{node.ord}\t{predicate_form}\t{clause_type}\t"
+            f"{sent_id}\t{node.ord}\t{sentence}\t{predicate_form}\t{clause_type}\t"
             f"{clause_position}\t{relation_to_regent}"
         )
-        #print(node.root.get_sentence())
 
     # ------------------------------------------------------------------
     # helpers
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def _sentence_with_marked_se(se_node):
+        """Return the full sentence text with *se_node* wrapped in ``<>``."""
+        tokens = se_node.root.descendants
+        parts = []
+        for token in tokens:
+            form = token.form
+            if token is se_node:
+                form = f"<{form}>"
+            parts.append(form)
+        return " ".join(parts)
 
     @staticmethod
     def _predicate_form(predicate):

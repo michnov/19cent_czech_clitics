@@ -88,9 +88,9 @@ pred-clause_type: $(OUTPUT_DIR)/$(DATA_NAME).pred-clause_type.txt
 pred-clause_position: $(OUTPUT_DIR)/$(DATA_NAME).pred-clause_position.txt
 pred-relation_to_regent: $(OUTPUT_DIR)/$(DATA_NAME).pred-relation_to_regent.txt
 
-$(OUTPUT_DIR)/$(DATA_NAME).pred-clause_type.txt: PRED_COL=4
-$(OUTPUT_DIR)/$(DATA_NAME).pred-clause_position.txt: PRED_COL=5
-$(OUTPUT_DIR)/$(DATA_NAME).pred-relation_to_regent.txt: PRED_COL=6
+$(OUTPUT_DIR)/$(DATA_NAME).pred-clause_type.txt: PRED_COL=5
+$(OUTPUT_DIR)/$(DATA_NAME).pred-clause_position.txt: PRED_COL=6
+$(OUTPUT_DIR)/$(DATA_NAME).pred-relation_to_regent.txt: PRED_COL=7
 $(OUTPUT_DIR)/$(DATA_NAME).pred-%.txt: $(OUTPUT_DIR)/$(DATA_NAME).features.tsv
 	mkdir -p $(OUTPUT_DIR)
 	tail -n+2 $< | cut -f$(PRED_COL) > $@
@@ -108,7 +108,7 @@ eval-all : $(OUTPUT_DIR)/$(DATA_NAME).eval-clause_type.txt \
 # Skip line numbers are 0-based (matching evaluate.py convention).
 # Derived from 1-based data row numbers (not counting the TSV header):
 #   gold rows to skip: 50, 112, 113, 123, 126  → 0-based: 49 111 112 122 125
-#   pred rows to skip: 112, 113                → 0-based: 111 112
+#   pred rows to skip: 111, 112, 113, 114      → 0-based: 110 111 112 113
 eval-clause_type: $(OUTPUT_DIR)/$(DATA_NAME).eval-clause_type.txt
 eval-clause_position: $(OUTPUT_DIR)/$(DATA_NAME).eval-clause_position.txt
 eval-relation_to_regent: $(OUTPUT_DIR)/$(DATA_NAME).eval-relation_to_regent.txt
